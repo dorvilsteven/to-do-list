@@ -7,12 +7,32 @@ const clearBtn = document.querySelector('.clear-tasks');
 loadEventListeners();
 
 function loadEventListeners() {
+  // reload event
+  document.addEventListener('DOMContentLoaded', getTasks);
   form.addEventListener('submit', addTask);
   taskList.addEventListener('click', deleteTask);
   clearBtn.addEventListener('click', clearTasks);
   filter.addEventListener('keyup', filterTask);
 }
-
+// get task from local storage
+function getTasks() {
+  let tasks;
+  if (localStorage.getItem('tasks') === null) {
+    tasks = [];
+  } else {
+    tasks = JSON.parse(localStorage.getItem('tasks'));
+  }
+  tasks.forEach(function(task) {
+    const li = document.createElement('li');
+    li.className = 'collection-item';
+    li.appendChild(document.createTextNode(task));
+    const link = document.createElement('a');
+    link.className = 'delete-item secondary-content';
+    link.innerHTML = '<i class="fa fa-remove"></i>';
+    li.appendChild(link);
+    taskList.appendChild(li);
+  });
+}
 function addTask(e) {
   if (taskInput.value === '') {
     alert('Please enter a task');
@@ -25,16 +45,32 @@ function addTask(e) {
     link.innerHTML = '<i class="fa fa-remove"></i>';
     li.appendChild(link);
     taskList.appendChild(li);
+    // local storage
+    saveTask(taskInput.value);
     taskInput.value = '';
   }
   e.preventDefault();
+}
+function saveTask(task) {
+  let tasks;
+  if (localStorage.getItem('tasks') === null) {
+    tasks = [];
+  } else {
+    tasks = JSON.parse(localStorage.getItem('tasks'));
+  }
+  tasks.push(task);
+  localStorage.setItem('tasks', JSON.stringify(tasks));
 }
 function deleteTask(e) {
   if (e.target.parentElement.classList.contains('delete-item')) {
     if (confirm(`Are you sure you want to delete task: ${e.target.parentElement.previousSibling.textContent}`)) {
       e.target.parentElement.parentElement.remove();
+      removeFromLS(e.target.parentElement.parentElement);
     }
   }
+}
+function removeFromLS(taskItem) {
+  // finish !!!!!!!!!!!
 }
 function clearTasks() {
   while(taskList.firstChild) {
